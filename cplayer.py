@@ -72,9 +72,8 @@ try:
     if args.color and curses.can_change_color():
         curses.start_color()
         curses.use_default_colors()
+        curses_color = color.CursesColor()
     window = curses.newwin(height, width, 0, 0)
-
-    curses_color = color.CursesColor()
 
     while True:
         ok, orig_frame = video.read()
