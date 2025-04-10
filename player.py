@@ -7,12 +7,19 @@ import numpy as np
 import color
 import youtube_utils
 from functools import lru_cache
+from pydub import AudioSegment
+from pydub.playback import play
+import threading
+
+def play_audio(filepath):
+    import os
+    os.system(f"afplay '{filepath}'")
 
 parser = argparse.ArgumentParser(description='ASCII Player')
 parser.add_argument("--width", type=int, default=120,
                     help="width of the terminal window")
 parser.add_argument("--fps", type=int, default=30,
-                    help="width of the terminal window")
+                    help="frames per second")
 parser.add_argument("--show", type=bool, default=False,
                     help="show the original video in an opencv window")
 parser.add_argument("--inv", type=bool, default=False,
@@ -77,11 +84,13 @@ def paint_embedding(window: curses.window, embedding: str, embedding_height: int
         except:
             pass
 
-
 try:
-    if type(video) is str \
-       and not os.path.isfile(video) \
-       and not youtube_utils.is_youtube_url(video):
+    if isinstance(video, str) and os.path.isfile(video):
+        # 🎵 Start audio playback in the background
+        audio_thread = threading.Thread(target=play_audio, args=(video,))
+        audio_thread.start()
+
+    if isinstance(video, str) and not os.path.isfile(video) and not youtube_utils.is_youtube_url(video):
         print("failed to find video at:", args.video)
 
     if youtube_utils.is_youtube_url(video):
@@ -93,7 +102,6 @@ try:
         print("could not extract frame from video")
 
     ratio = width / frame.shape[1]
-    # charachter height is 2 times character width
     height = int(frame.shape[0] * ratio * 3 / 5)
     print(frame.shape)
     print(width, height, ratio)
