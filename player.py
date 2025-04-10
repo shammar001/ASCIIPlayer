@@ -7,12 +7,10 @@ import numpy as np
 import color
 import youtube_utils
 from functools import lru_cache
-from pydub import AudioSegment
-from pydub.playback import play
 import threading
 
+# macOS audio playback with afplay
 def play_audio(filepath):
-    import os
     os.system(f"afplay '{filepath}'")
 
 parser = argparse.ArgumentParser(description='ASCII Player')
@@ -86,7 +84,7 @@ def paint_embedding(window: curses.window, embedding: str, embedding_height: int
 
 try:
     if isinstance(video, str) and os.path.isfile(video):
-        # 🎵 Start audio playback in the background
+        # Start audio playback in the background
         audio_thread = threading.Thread(target=play_audio, args=(video,))
         audio_thread.start()
 
